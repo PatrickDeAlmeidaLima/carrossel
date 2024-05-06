@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrossel com Drag and Drop</title>
+  <style>
+    .carousel {
+      display: flex;
+      overflow: hidden;
+      /* Desabilita o scroll */
+      padding: 10px;
+      flex-direction: row;
+      align-items: center;
+      gap: 45px;
+      cursor: grab;
+    }
+
+    .item {
+      flex-shrink: 0;
+      width: 300px;
+    }
+
+    .carousel.dragging {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="brasilia-1-min-container">
+    <div class="carousel" id="carousel">
+      <div class="item">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/C5xuJpeuIQ-/?img_index=1" data-instgrm-version="13">
+        </blockquote>
+      </div>
+      <!-- Outras divs de item conforme necessário -->
+      <div class="item">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/C6xvLpeuGH-/?img_index=1" data-instgrm-version="13">
+        </blockquote>
+      </div>
+      <div class="item">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/C6xvLpeuGH-/?img_index=1" data-instgrm-version="13">
+        </blockquote>
+      </div>
+      <div class="item">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/C6xvLpeuGH-/?img_index=1" data-instgrm-version="13">
+        </blockquote>
+      </div>
+      <div class="item">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/C6xvLpeuGH-/?img_index=1" data-instgrm-version="13">
+        </blockquote>
+      </div>
+      <div class="item">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/C6xvLpeuGH-/?img_index=1" data-instgrm-version="13">
+        </blockquote>
+      </div>
+      <div class="item">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/C6xvLpeuGH-/?img_index=1" data-instgrm-version="13">
+        </blockquote>
+      </div>
+      <div class="item">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/C6xvLpeuGH-/?img_index=1" data-instgrm-version="13">
+        </blockquote>
+      </div>
+    </div>
+  </div>
+
+  <script async src="https://www.instagram.com/embed.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const carousel = document.getElementById('carousel');
+
+      let isDragging = false;
+      let isTouching = false; 
+      let startX;
+      let scrollLeft;
+
+      // Variáveis para controlar a rolagem suave
+      let scrollAmount = 1; // Quantidade de rolagem por intervalo de tempo
+      const scrollInterval = 30; // Intervalo de tempo entre atualizações em milissegundos
+      let autoScrollInterval; // Armazena o intervalo da rolagem automática
+
+      // Função para iniciar a rolagem automática
+      function startAutoScroll() {
+        console.log("Iniciando rolagem automática");
+        autoScrollInterval = setInterval(autoScroll, scrollInterval);
+      }
+
+      // Função para pausar a rolagem automática
+      function stopAutoScroll() {
+        console.log("Pausando rolagem automática");
+        clearInterval(autoScrollInterval);
+      }
+
+      // Função para rolar o carrossel automaticamente
+      function autoScroll() {
+        console.log("Rolando carrossel automaticamente");
+        carousel.scrollLeft += scrollAmount;
+
+        // Verifica se o carrossel chegou ao final ou início para inverter a direção
+        if (carousel.scrollLeft >= (carousel.scrollWidth - carousel.clientWidth) || carousel.scrollLeft <= 0) {
+          console.log("Invertendo direção da rolagem");
+          scrollAmount *= -1; // Inverte a direção da rolagem
+        }
+      }
+
+      carousel.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+        carousel.classList.add('dragging'); // Muda o cursor
+        stopAutoScroll(); // Pausa a rolagem automática enquanto o usuário arrasta
+        console.log("Iniciando arrasto");
+        e.preventDefault();
+      });
+
+      carousel.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 1; // Multiplicador para controlar a velocidade de rolagem
+        carousel.scrollLeft = scrollLeft - walk;
+        console.log("Arrastando carrossel");
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        carousel.classList.remove('dragging');
+        startAutoScroll(); // Retoma a rolagem automática após o usuário soltar o arrasto
+        console.log("Finalizando arrasto");
+      });
+
+      carousel.addEventListener('touchstart', (e) => {
+        isTouching = true;
+        startX = e.touches[0].pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+        carousel.classList.add('dragging');
+        stopAutoScroll();
+        console.log("Iniciando toque");
+        e.preventDefault();
+      });
+
+      carousel.addEventListener('touchmove', (e) => {
+        if (!isTouching) return;
+        e.preventDefault();
+        const x = e.touches[0].pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 1; // Multiplicador para controlar a velocidade de rolagem
+        carousel.scrollLeft = scrollLeft - walk;
+        console.log("Arrastando carrossel com toque");
+      });
+
+      carousel.addEventListener('touchend', () => {
+        isTouching = false;
+        carousel.classList.remove('dragging');
+        startAutoScroll(); // Retoma a rolagem automática após o usuário soltar o toque
+        console.log("Finalizando toque");
+      });
+
+      carousel.addEventListener('mouseenter', () => {
+        console.log("Mouse ou toque entrou no carrossel, pausando rolagem automática");
+        stopAutoScroll();
+      });
+
+      carousel.addEventListener('mouseleave', () => {
+        console.log("Mouse ou toque saiu do carrossel, retomando rolagem automática");
+        startAutoScroll();
+      });
+
+      console.log("Iniciando carrossel");
+      startAutoScroll();
+    });
+
+  </script>
+
+</body>
+
+</html>
